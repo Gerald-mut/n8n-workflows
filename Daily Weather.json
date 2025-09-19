@@ -1,0 +1,166 @@
+{
+  "name": "Daily Weather",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -336,
+        0
+      ],
+      "id": "e6b4255d-1585-411c-a9a7-df2f7d124271",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "url": "https://api.openweathermap.org/data/2.5/weather",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "Nairobi"
+            },
+            {
+              "name": "units",
+              "value": "metric"
+            },
+            {
+              "name": "appid",
+              "value": "9f4682794f1804e382c9ebec8ee77c51"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -144,
+        0
+      ],
+      "id": "1e25d381-c334-433d-a107-63d01686beee",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "url": "https://api.quotable.io/random",
+        "options": {
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        32,
+        0
+      ],
+      "id": "096db152-75ee-4ed7-bbf6-066ce4e50f9d",
+      "name": "Quote"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "63cdc239-7112-4089-8b1b-a49dc557aa00",
+              "name": "Message",
+              "value": "=Good morning! ☀️  Location: {{$node[\"HTTP Request\"].json[\"name\"]}} Weather: {{$node[\"HTTP Request\"].json[\"weather\"][0][\"description\"]}} — {{$node[\"HTTP Request\"].json[\"main\"][\"temp\"]}}°C Humidity: {{$node[\"HTTP Request\"].json[\"main\"][\"humidity\"]}}% Wind: {{$node[\"HTTP Request\"].json[\"wind\"][\"speed\"]}} m/s  Quote of the day: “{{$node[\"Quote\"].json[\"content\"]}}” — {{$node[\"Quote\"].json[\"author\"]}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "b5a0cbec-1f08-4cc5-97ef-f66b2fd13365",
+      "name": "Compose Message"
+    },
+    {
+      "parameters": {
+        "chatId": "6222905306",
+        "text": "={{ $node[\"Compose Message\"].json[\"Message\"] }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "301cb46e-a526-478b-a2af-02a3cfcf914b",
+      "name": "Send a text message",
+      "webhookId": "ea660bda-276c-4ed2-a666-744ec9ce2cc1",
+      "credentials": {
+        "telegramApi": {
+          "id": "N8uzvIS8VY5h5OMt",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Quote",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Quote": {
+      "main": [
+        [
+          {
+            "node": "Compose Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compose Message": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c6f51287-54f4-4513-8c07-1e40f9521315",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "8a1adce7184c9a33210e586ed9b3a7b37cb18664ed6e1cfb93f5ddb4eb6560f9"
+  },
+  "id": "VwI2n6VZB4CgkOrF",
+  "tags": []
+}
